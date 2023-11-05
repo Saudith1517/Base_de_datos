@@ -1,0 +1,268 @@
+EJERCICIOS PRIMER CICLO (1-30): 
+
+Consultas Básicas:
+
+Mostrar todos los clientes en la tabla "Cliente".
+- SELECT * FROM ClientePLSQL;
+Mostrar todos los autos en la tabla "Auto".
+- SELECT * FROM AutoPLSQL;
+Mostrar todos los alquileres en la tabla "Alquiler".
+- SELECT * FROM AlquilerPLSQL;
+Mostrar todas las sucursales en la tabla "Sucursal".
+- SELECT * FROM SucursalPLSQL;
+Mostrar todas las reservas en la tabla "Reserva".
+- SELECT * FROM ReservaPLSQL;
+
+Filtros y Ordenamiento:
+
+Mostrar los clientes que se llaman "Juan".
+- SELECT * FROM ClientePLSQL WHERE NOMBRE LIKE 'Juan%'; 
+Mostrar los autos de marca "Toyota".
+- SELECT * FROM AutoPLSQL WHERE MARCA = 'Toyota%';
+Mostrar los alquileres que ocurrieron después de una fecha específica.
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio > TO_DATE('2023-05-23', 'YYYY-MM-DD');
+Mostrar las sucursales ubicadas en "Madrid".
+- SELECT * FROM SucursalPLSQL WHERE CIUDAD = 'Madrid';
+Mostrar las reservas realizadas por un cliente específico.
+- SELECT sa.* FROM ClientePLSQL s INNER JOIN ReservaPLSQL sa ON s.id_cliente = sa.id_cliente WHERE s.id_cliente = '15';
+
+Join y Relaciones:
+
+Mostrar los alquileres con los nombres de los clientes y las marcas de los autos.
+- SELECT c.nombre, a.marca FROM ClientePLSQL c INNER JOIN AlquilerPLSQL al ON c.id_cliente = al.id_cliente INNER JOIN AutoPLSQL a ON al.id_auto = a.id_auto;
+Mostrar los clientes que han realizado reservas en una sucursal específica.
+- SELECT c.nombre, c.id_cliente FROM ClientePLSQL c INNER JOIN ReservaPLSQL r ON c.id_cliente = r.id_cliente WHERE r.id_sucursal = '588';
+Mostrar los autos que han sido alquilados junto con los nombres de los clientes.
+- SELECT c.nombre, a.marca, a.modelo FROM ClientePLSQL c INNER JOIN AlquilerPLSQL al ON c.id_cliente = al.id_cliente INNER JOIN AutoPLSQL a ON al.id_auto = a.id_auto;
+Mostrar los detalles de las reservas con los nombres de los clientes y las ciudades de las sucursales.
+- SELECT c.nombre, s.ciudad, r.* FROM ClientePLSQL c INNER JOIN ReservaPLSQL r ON c.id_cliente = r.id_cliente INNER JOIN SucursalPLSQL s ON r.id_sucursal = s.id_sucursal;
+Mostrar los clientes que no han realizado ninguna reserva.
+- SELECT c.* FROM ClientePLSQL c LEFT JOIN ReservaPLSQL r ON c.id_cliente = r.id_cliente WHERE r.id_reserva IS NULL OR r.id_reserva = '';
+
+Agregación y Agrupamiento:
+
+Contar cuántos autos hay de cada marca en la tabla "Auto".
+- SELECT marca, COUNT( * ) AS cantidad FROM AutoPLSQL GROUP BY marca; 
+Calcular la duración promedio de los alquileres.
+- SELECT ROUND(AVG(fecha_fin-fecha_inicio),2) AS tiempo_promedio FROM AlquilerPLSQL; 
+Mostrar el número total de reservas realizadas en cada sucursal.
+- SELECT r.id_sucursal, COUNT( * ) AS total_reservas FROM ReservaPLSQL r GROUP BY r.id_sucursal;
+Encontrar el cliente que ha realizado la mayor cantidad de alquileres.
+- SELECT c.id_cliente, nombre, COUNT(al.id_alquiler) AS cantidad_alquileres FROM ClientePLSQL c INNER JOIN AlquilerPLSQL al ON al.id_cliente = c.id_cliente GROUP BY c.id_cliente, nombre HAVING COUNT(al.id_alquiler) = ( SELECT MAX(cantidad_alquileres) FROM ( SELECT COUNT(id_alquiler) AS cantidad_alquileres FROM ClientePLSQL INNER JOIN AlquilerPLSQL ON AlquilerPLSQL.id_cliente = ClientePLSQL.id_cliente GROUP BY ClientePLSQL.id_cliente ) subquery );
+Calcular el promedio de años de los autos en la tabla "Auto".
+- SELECT ROUND(AVG(ano)) AS promedio_anos FROM AutoPLSQL;
+
+Subconsultas:
+
+Mostrar los clientes que han realizado al menos una reserva.
+- SELECT c.id_cliente, c.nombre FROM ClientePLSQL c WHERE EXISTS ( SELECT 1 FROM ReservaPLSQL r WHERE c.id_cliente = r.id_cliente );
+Mostrar los autos que no han sido alquilados aún.
+- SELECT a.id_auto, a.marca, a.modelo FROM AutoPLSQL a LEFT JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto WHERE al.id_auto IS NULL;
+Encontrar los clientes que han alquilado el mismo auto más de una vez.
+- SELECT c.id_cliente, nombre, direccion, telefono, al.id_auto FROM clienteplsql c INNER JOIN alquilerplsql al ON c.id_cliente = al.id_cliente INNER JOIN autoplsql au ON au.id_auto = al.id_auto WHERE al.id_auto = 2;
+Mostrar los clientes que han realizado alquileres en la misma ciudad en la que viven.
+- 
+Encontrar los autos que han sido alquilados en la misma sucursal donde se realizó una reserva.
+- SELECT DISTINCT au.id_auto, au.marca, au.ano, su.id_sucursal FROM AutoPLSQL au INNER JOIN AlquilerPLSQL al ON au.id_auto = al.id_auto INNER JOIN ReservaPLSQL r ON al.id_reserva = r.id_reserva AND al.id_cliente = r.id_cliente INNER JOIN SucursalPLSQL su ON r.id_sucursal = su.id_sucursal WHERE su.id_sucursal = 59;
+
+Actualizaciones y Eliminaciones:
+
+Actualizar la dirección de un cliente específico.
+- UPDATE ClientePLSQL SET direccion = 'Calle 15 sur #33-22' WHERE id_cliente = '435';
+Eliminar un auto de la tabla "Auto".
+- DELETE FROM AutoPLSQL WHERE id_auto = '63';
+Marcar una reserva como completada actualizando la fecha de fin.
+- UPDATE ReservaPLSQL SET fecha_reserva = SYSDATE WHERE id_reserva = 775;
+Eliminar todas las reservas realizadas por un cliente específico.
+- DELETE FROM ReservaPLSQL WHERE id_cliente = '15';
+Actualizar el año de un auto en la tabla "Auto".
+- UPDATE AutoPLSQL SET ano = '2025' WHERE id_auto = '715';
+
+EJERCICIOS SEGUNDO CICLO (31-80):
+
+- SELECT * FROM ClientePLSQL; 
+- SELECT * FROM AutoPLSQL; 
+- SELECT * FROM AlquilerPLSQL; 
+- SELECT c.nombre, a.marca, a.modelo FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente; 
+- SELECT a.marca, a.modelo, a.ano FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto; 
+- SELECT * FROM AlquilerPLSQL WHERE id_cliente = 1; 
+- SELECT * FROM AlquilerPLSQL WHERE id_auto = 1; 
+- SELECT * FROM AlquilerPLSQL WHERE id_sucursal = 1; 
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio = '2023-09-27'; 
+- SELECT COUNT( * ) FROM AlquilerPLSQL;
+- SELECT c.nombre FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente JOIN SucursalPLSQL s ON a.id_sucursal = s.id_sucursal WHERE s.nombre = 'Sucursal Central';
+- SELECT a.marca, a.modelo FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto WHERE al.id_cliente = 1 AND al.fecha_inicio = '2023-09-27';
+- SELECT * FROM AlquilerPLSQL WHERE fecha_fin - fecha_inicio > 7;
+- SELECT c.nombre, COUNT( * ) AS numero_alquileres FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente GROUP BY c.nombre ORDER BY numero_alquileres DESC LIMIT 1;
+- SELECT a.marca, a.modelo, COUNT( * ) AS numero_alquileres FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto GROUP BY a.marca, a.modelo ORDER BY numero_alquileres DESC LIMIT 1;
+- SELECT s.nombre, COUNT( * ) AS numero_alquileres FROM SucursalPLSQL s JOIN AlquilerPLSQL al ON s.id_sucursal = al.id_sucursal GROUP BY s.nombre ORDER BY numero_alquileres DESC LIMIT 1;
+- SELECT EXTRACT(MONTH FROM fecha_inicio) AS mes, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(MONTH FROM fecha_inicio) ORDER BY numero_alquileres DESC LIMIT 1;
+- SELECT EXTRACT(DAYOFWEEK FROM fecha_inicio) AS dia_semana, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(DAYOFWEEK FROM fecha_inicio) ORDER BY numero_alquileres DESC LIMIT 1;
+- SELECT * FROM AlquilerPLSQL ORDER BY precio DESC LIMIT 1;
+- SELECT * FROM AlquilerPLSQL ORDER BY precio ASC LIMIT 1;
+- SELECT * FROM ClientePLSQL WHERE nombre LIKE '%Juan%'; 
+- SELECT a.marca, a.modelo, a.ano FROM AutoPLSQL a WHERE precio < 10000; 
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30'; 
+- SELECT c.nombre, a.marca, a.modelo FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente WHERE c.direccion LIKE '%Bogotá%'; 
+- SELECT a.marca, a.modelo, a.ano FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto WHERE al.id_reserva = 1; 
+- SELECT * FROM AlquilerPLSQL WHERE id_cliente IN (1, 2, 3); 
+- SELECT * FROM AlquilerPLSQL WHERE id_auto IN (1, 2, 3); 
+- SELECT * FROM AlquilerPLSQL WHERE id_sucursal IN (1, 2, 3); 
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30' AND id_cliente IN (1, 2, 3); 
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30' AND id_auto IN (1, 2, 3); 
+- SELECT * FROM AlquilerPLSQL WHERE fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30' AND id_sucursal IN (1, 2, 3);
+- SELECT c.nombre, COUNT( * ) AS numero_alquileres FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente GROUP BY c.nombre ORDER BY numero_alquileres DESC LIMIT 1; 
+- SELECT a.marca, a.modelo, COUNT( * ) AS numero_alquileres FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto GROUP BY a.marca, a.modelo ORDER BY numero_alquileres DESC LIMIT 1; 
+- SELECT s.nombre, COUNT( * ) AS numero_alquileres FROM SucursalPLSQL s JOIN AlquilerPLSQL al ON s.id_sucursal = al.id_sucursal GROUP BY s.nombre ORDER BY numero_alquileres DESC LIMIT 1; 
+- SELECT EXTRACT(MONTH FROM fecha_inicio) AS mes, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(MONTH FROM fecha_inicio) ORDER BY numero_alquileres DESC LIMIT 1; 
+- SELECT EXTRACT(DAYOFWEEK FROM fecha_inicio) AS dia_semana, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(DAYOFWEEK FROM fecha_inicio) ORDER BY numero_alquileres DESC LIMIT 1; 
+- SELECT * FROM AlquilerPLSQL ORDER BY precio DESC LIMIT 1; 
+- SELECT * FROM AlquilerPLSQL ORDER BY precio ASC LIMIT 1; 
+- SELECT * FROM ClientePLSQL WHERE nombre LIKE '%Juan%' AND fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30'; 
+- SELECT a.marca, a.modelo, a.ano FROM AutoPLSQL a WHERE precio < 10000 AND fecha_inicio BETWEEN '2023-09-01' AND '2023-09-30';
+
+EJERCICIOS TERCER CICLO (81-90):
+
+- CREATE VIEW vista_clientes_alquilados_sucursal AS SELECT c.nombre, a.marca, a.modelo FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente JOIN SucursalPLSQL s ON a.id_sucursal = s.id_sucursal WHERE s.nombre = 'Sucursal Central'; 
+- CREATE VIEW vista_autos_alquilados_cliente_fecha AS SELECT a.marca, a.modelo FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto WHERE al.id_cliente = 1 AND al.fecha_inicio = '2023-09-27'; 
+- CREATE VIEW vista_alquileres_mas_7dias AS SELECT * FROM AlquilerPLSQL WHERE fecha_fin - fecha_inicio > 7; CREATE VIEW vista_clientes_mas_alquileres AS SELECT c.nombre, COUNT( * ) AS numero_alquileres FROM ClientePLSQL c JOIN AlquilerPLSQL a ON c.id_cliente = a.id_cliente GROUP BY c.nombre ORDER BY numero_alquileres DESC; 
+- CREATE VIEW vista_autos_mas_alquileres AS SELECT a.marca, a.modelo, COUNT( * ) AS numero_alquileres FROM AutoPLSQL a JOIN AlquilerPLSQL al ON a.id_auto = al.id_auto GROUP BY a.marca, a.modelo ORDER BY numero_alquileres DESC; CREATE VIEW vista_sucursales_mas_alquileres AS SELECT s.nombre, COUNT( * ) AS numero_alquileres FROM SucursalPLSQL s JOIN AlquilerPLSQL al ON s.id_sucursal = al.id_sucursal GROUP BY s.nombre ORDER BY numero_alquileres DESC; 
+- CREATE VIEW vista_meses_mas_alquileres AS SELECT EXTRACT(MONTH FROM fecha_inicio) AS mes, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(MONTH FROM fecha_inicio) ORDER BY numero_alquileres DESC; 
+- CREATE VIEW vista_dias_semana_mas_alquileres AS SELECT EXTRACT(DAYOFWEEK FROM fecha_inicio) AS dia_semana, COUNT( * ) AS numero_alquileres FROM AlquilerPLSQL GROUP BY EXTRACT(DAYOFWEEK FROM fecha_inicio) ORDER BY numero_alquileres DESC; 
+- CREATE VIEW vista_alquileres_mas_caros AS SELECT * FROM AlquilerPLSQL ORDER BY precio DESC; 
+- CREATE VIEW vista_alquileres_mas_baratos AS SELECT * FROM AlquilerPLSQL ORDER BY precio ASC;
+
+EJERCICIOS TERCER CICLO (91-100):
+
+- CREATE TRIGGER trg_insert_auto
+BEFORE INSERT ON AutoPLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de autos disponibles
+  UPDATE AutoPLSQL
+    SET numero_disponibles = numero_disponibles + 1
+  WHERE id_auto = NEW.id_auto;
+END;
+
+- CREATE TRIGGER trg_delete_auto
+BEFORE DELETE ON AutoPLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de autos disponibles
+  UPDATE AutoPLSQL
+    SET numero_disponibles = numero_disponibles - 1
+  WHERE id_auto = OLD.id_auto;
+END;
+
+- CREATE TRIGGER trg_update_auto
+BEFORE UPDATE ON AutoPLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de autos disponibles
+  IF NEW.numero_disponibles != OLD.numero_disponibles THEN
+    UPDATE AutoPLSQL
+      SET numero_disponibles = NEW.numero_disponibles
+      WHERE id_auto = NEW.id_auto;
+  END IF;
+END;
+
+- CREATE TRIGGER trg_insert_cliente
+BEFORE INSERT ON ClientePLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de clientes
+  UPDATE ClientePLSQL
+    SET numero_clientes = numero_clientes + 1;
+END;
+
+- CREATE TRIGGER trg_delete_cliente
+BEFORE DELETE ON ClientePLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de clientes
+  UPDATE ClientePLSQL
+    SET numero_clientes = numero_clientes - 1;
+END;
+
+- CREATE TRIGGER trg_update_cliente
+BEFORE UPDATE ON ClientePLSQL
+FOR EACH ROW
+BEGIN
+  -- Actualizar el número de clientes
+  IF NEW.numero_alquileres != OLD.numero_alquileres THEN
+    UPDATE ClientePLSQL
+      SET numero_alquileres = NEW.numero_alquileres
+      WHERE id_cliente = NEW.id_cliente;
+  END IF;
+END;
+
+
+- CREATE PROCEDURE proc_calcular_precio_alquiler
+(
+  IN id_alquiler INT,
+  IN id_auto INT,
+  IN fecha_inicio DATE,
+  IN fecha_fin DATE
+)
+AS
+BEGIN
+  -- Calcular el precio del alquiler
+  DECLARE
+    precio_base NUMERIC(10, 2);
+    dias_alquiler INT;
+  BEGIN
+    precio_base := (SELECT precio FROM AutoPLSQL WHERE id_auto = id_auto);
+    dias_alquiler := (fecha_fin - fecha_inicio) + 1;
+    SET NEW.precio = precio_base * dias_alquiler;
+  END;
+END;
+
+- CREATE PROCEDURE proc_listar_alquileres_cliente
+(
+  IN id_cliente INT
+)
+AS
+BEGIN
+  -- Listar los alquileres del cliente
+  SELECT *
+  FROM AlquilerPLSQL
+  WHERE id_cliente = id_cliente;
+END;
+
+- CREATE PROCEDURE proc_listar_autos_sucursal
+(
+  IN id_sucursal INT
+)
+AS
+BEGIN
+  -- Listar los autos de la sucursal
+  SELECT *
+  FROM AutoPLSQL
+  WHERE id_sucursal = id_sucursal;
+END;
+
+- CREATE PROCEDURE proc_agregar_auto
+(
+  IN marca VARCHAR(255),
+  IN modelo VARCHAR(255),
+  IN ano INT,
+  IN numero_disponibles INT
+)
+AS
+BEGIN
+  -- Insertar un nuevo auto
+  INSERT INTO AutoPLSQL (marca, modelo, ano, numero_disponibles)
+  VALUES (marca, modelo, ano, numero_disponibles);
+END;
+
+- CREATE PROCEDURE proc_eliminar_auto
+(
+  IN id_auto INT
+)
+AS
+BEGIN
+  -- Eliminar un auto
+  DELETE FROM AutoPLSQL
+  WHERE id_auto = id_auto;
+END;
+
